@@ -1,0 +1,70 @@
+# Criado por Luize Real Lansini para gerar o gráfico de participações do Grêmio Esportivo Brasil nas ligas nacionais brasileiras (séries A, B, C e D), disponível em https://pt.wikipedia.org/wiki/Gr%C3%AAmio_Esportivo_Brasil.
+
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Dados fornecidos
+data = {
+    "Ano (Série)": [1978, 1979, 1980, 1984, 1985, 1986, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2006, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+    "Série": ["A", "A", "B", "A", "A", "B", "C", "C", "C", "C", "C", "B", "C", "C", "C", "C", "C", "C", "C", "C", "D", "D", "C", "B", "B", "B", "B", "B", "B", "C", "D", "D"],
+    "Posição": [72, 32, 51, 23, 3, 74, 14, 51, 41, 5, 15, 32, 14, 18, 87, 7, 6, 6, 14, 19, 25, 2, 4, 11, 8, 11, 14, 12, 20, 18, 29, 15],
+    "Times participantes": [74, 94, 64, 41, 44, 80, 107, 58, 64, 66, 36, 36, 65, 61, 93, 64, 63, 20, 20, 20, 40, 41, 20, 20, 20, 20, 20, 20, 20, 20, 64, 64],
+}
+
+# Criando um DataFrame
+df = pd.DataFrame(data)
+
+# Mapeamento das cores
+cores = {
+    "A": "#E62B2B",
+    "B": "#B51D1D",
+    "C": "#808080",
+    "D": "#000000",
+}
+
+# Criando o gráfico principal
+plt.figure(figsize=(16, 9))
+
+# Gráfico de área invertido para "Times participantes" (colocado antes dos pontos)
+plt.fill_between(df["Ano (Série)"], df["Times participantes"], color="#CDFFD8", alpha=0.3, label="Times Participantes")
+plt.plot(df["Ano (Série)"], df["Times participantes"], color="#CDFFD8", alpha=0.6)
+
+# Gráfico de pontos por série
+for serie in df["Série"].unique():
+    subset = df[df["Série"] == serie]
+    
+    # Adicionando os pontos
+    plt.scatter(subset["Ano (Série)"], subset["Posição"], label=f"Série {serie}", color=cores[serie], s=100)
+
+    # Adicionando as linhas com transparência de 30%
+    plt.plot(subset["Ano (Série)"], subset["Posição"], color=cores[serie], alpha=0.3)
+
+    # Adicionando os valores da Posição abaixo dos pontos
+    for i in range(len(subset)):
+        plt.text(
+            subset["Ano (Série)"].iloc[i],
+            subset["Posição"].iloc[i] - 6,  # Ajuste para colocar o texto mais abaixo
+            f"{subset['Posição'].iloc[i]}",
+            fontsize=10,
+            ha="center",
+            va="top",
+        )
+
+# Personalizando o gráfico
+plt.title("Variação da Posição ao Longo dos Anos e Times Participantes", fontsize=16)
+plt.xlabel("Ano (Série)", fontsize=12)
+plt.ylabel("Posição / Times Participantes", fontsize=12)
+plt.gca().invert_yaxis()  # Invertendo o eixo Y
+plt.grid(True, linestyle="--", alpha=0.6)
+
+# Ajustando os rótulos do eixo X para incluir a Série entre parênteses e rotacionando em 90 graus
+labels = [f"{ano} ({serie})" for ano, serie in zip(df["Ano (Série)"], df["Série"])]
+plt.xticks(df["Ano (Série)"], labels, rotation=90)
+
+# Posicionando a legenda na parte superior
+plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=3, fontsize=10)
+
+plt.tight_layout()
+
+# Mostrando o gráfico
+plt.show()
